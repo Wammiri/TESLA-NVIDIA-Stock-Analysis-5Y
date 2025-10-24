@@ -37,6 +37,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
 sns.set(style="whitegrid", context="talk")
 
@@ -50,6 +52,7 @@ PERIOD = "5y"
 INTERVAL = "1d"
 TRADING_DAYS = 252
 ROLL_WINDOW = 30
+risk_free_rate = 0.04
 
 # Download adjusted close prices
 stock_data = yf.download(all_tickers, period=PERIOD, interval=INTERVAL)["Close"]
@@ -119,7 +122,7 @@ def get_metrics(price_df, trading_days=252):
     cum_rtn = (1 + daily_rtn).cumprod() - 1
     final_cum_rtn = cum_rtn.iloc[-1]
 
-    sharpe = ann_return / ann_vol
+    sharpe = (ann_return-risk_free_rate) / ann_vol
 
     consistency = (daily_rtn > 0).mean()
 
@@ -131,7 +134,7 @@ def get_metrics(price_df, trading_days=252):
         "Final Cumulative Return": final_cum_rtn,
         "Annualized Return": ann_return,
         "Annualized Volatility": ann_vol,
-        "Sharpe Ratio (rf=0)": sharpe,
+        "Sharpe Ratio (rf=4%)": sharpe,
         "Max Drawdown": mdd,
         "Hit Rate": consistency
     })
@@ -183,6 +186,14 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
+# Assuming 'returns' is a DataFrame with daily returns for TSLA and NVDA
+correlation_matrix = returns_df[['TSLA', 'NVDA']].corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+plt.title('Correlation Matrix: TSLA vs NVDA')
+plt.show()
+print("Correlation between TSLA and NVDA:", correlation_matrix.iloc[0, 1])
+
 """### Portfolio Simulation"""
 
 initial_investment = 10000
@@ -220,10 +231,60 @@ plt.tight_layout()
 plt.show()
 
 """**Insights:**  
-- A USD 10k investment in Tesla grew to ~USD 31k, while the same in NVIDIA grew to ~USD 135k.  
-- Splitting USD 10k equally across both delivered ~USD 82k, outperforming Tesla but under NVIDIA.  
+- A USD 10k investment in Tesla grew to ~USD 32k, while the same in NVIDIA grew to ~USD 139k.  
+- Splitting USD 10k equally across both delivered ~USD 86k, outperforming Tesla but under NVIDIA.  
 - The 50/50 blend reduced volatility and drawdowns relative to Tesla, showing the benefit of diversification.  
-- For risk-conscious investors, the balanced portfolio offered a smoother ride while still compounding strongly.
+- For risk-conscious investors, the balanced portfolio offered a smoother ride while still compounding strongly.  
+
+"""
+
+# --- Portfolio Metrics Comparison ---
+
+# Combine returns for portfolio
+portfolio_returns = portfolio_5050.pct_change().dropna()
+
+# Create dictionary of daily returns
+combined_returns = {
+    "Tesla": returns_df["TSLA"],
+    "NVIDIA": returns_df["NVDA"],
+    "50/50 Portfolio": portfolio_returns
+}
+
+# Compute metrics
+metrics = {}
+for name, data in combined_returns.items():
+    ann_return = (1 + data.mean())**TRADING_DAYS - 1
+    ann_vol = data.std() * np.sqrt(TRADING_DAYS)
+    sharpe = (ann_return - risk_free_rate) / ann_vol
+    metrics[name] = [ann_return, ann_vol, sharpe]
+
+# Build DataFrame
+metrics_df = pd.DataFrame(metrics, index=["Annualized Return", "Annualized Volatility", "Sharpe Ratio"]).T
+metrics_df = metrics_df.sort_values("Annualized Return", ascending=False)
+metrics_df.style.format("{:.2%}")
+
+# --- Visualization: Bar Chart Comparison ---
+
+plt.figure(figsize=(10,6))
+metrics_df.plot(kind="bar", figsize=(10,6), rot=0, width=0.7)
+plt.title("Tesla vs NVIDIA vs 50/50 Portfolio\nRisk-Return Metrics (Annualized)")
+plt.ylabel("Percentage / Ratio")
+plt.legend(title="Metric")
+plt.tight_layout()
+plt.show()
+
+"""## 🔍 Key Insights
+
+### 1. Performance Highlights  
+- **Highest Annualized Return:** **NVIDIA (94.20%)** — Massive upside, fueled by explosive AI-driven growth and market dominance.  
+- **Best Risk-Adjusted Return (Sharpe):** **NVIDIA (1.73)** — Strong returns per unit of risk, showing that its volatility was well-compensated by performance.  
+- **Lowest Volatility:** **50/50 Portfolio (48.53%)** — Diversification paid off. Pairing Tesla’s volatility with NVIDIA’s returns smoothed out the ride.
+
+### 2. What This Tells Us  
+NVIDIA has been the clear winner over the last five years — not just in returns, but in *risk efficiency*. Tesla’s wild swings make it exciting but less predictable. Meanwhile, a simple **50/50 mix** offers a strong middle ground: meaningful growth with better stability.  
+
+### 3. Big Takeaway  
+Balancing high-growth stocks with complementary volatility patterns can produce portfolios that *feel* less risky but still capture major upside — a key lesson for both **investors and FP&A professionals** thinking about risk-weighted performance.
 
 ## Final Insights Recap
 
