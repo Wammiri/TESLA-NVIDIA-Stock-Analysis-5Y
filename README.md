@@ -1,20 +1,19 @@
-# Tesla & NVIDIA Stock Analysis (5 Years)
+## 🚀 Tesla vs NVIDIA: 5-Year Stock Analysis
 
-## What this is
-A 5-year comparative analysis of Tesla (TSLA) and NVIDIA (NVDA) stock performance using Python, Pandas, NumPy, and Matplotlib.  
-The notebook explores returns, volatility, Sharpe ratios, drawdowns, and portfolio growth (including a 50/50 rebalanced portfolio).
+This project explores the performance of **Tesla (TSLA)** and **NVIDIA (NVDA)** from 2020–2025 using Python.
 
-## Why it matters
-This project demonstrates practical skills in:
-- Financial data collection with yfinance  
-- Risk/return analysis using Pandas and NumPy  
-- Visualization with Matplotlib/Seaborn  
-- Portfolio construction and performance evaluation  
+### Highlights
+- 📈 NVIDIA outperformed Tesla on both total and risk-adjusted returns.  
+- ⚖️ A 50/50 portfolio offered smoother growth and lower volatility.  
+- 🧮 Built with Pandas, NumPy, Matplotlib, and Seaborn.  
 
-These are directly relevant for FP&A, investment analysis, and data-driven finance roles.
+### Key Visuals
+1. **Risk-Return Comparison (Bar Chart)** – Annualized Return, Volatility, and Sharpe Ratio  
+2. **Portfolio Growth Simulation** – How a $10K investment evolved over 5 years  
 
-## How to run it
-1. Clone this repo  
-   ```bash
-   git clone https://github.com/wammiri/Tesla-NVIDIA-Stock-Analysis-5Y.git
-   cd Tesla-NVIDIA-Stock-Analysis-5Y
+### Notebook
+Check the full notebook here 👉 [Tesla_NVDA_Analysis.ipynb](./Tesla_NVDA_Analysis.ipynb)
+
+---
+
+💬 *This analysis demonstrates a practical approach to portfolio risk-return evaluation — blending finance and data analytics for actionable insight.*
